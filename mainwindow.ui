@@ -6,12 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>371</width>
-    <height>473</height>
+    <width>500</width>
+    <height>480</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Krant Daniil DevelopEx Final Test Task</string>
   </property>
   <property name="animated">
    <bool>true</bool>
@@ -20,7 +26,7 @@
    <widget class="QPushButton" name="startButton">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>34</x>
       <y>440</y>
       <width>75</width>
       <height>23</height>
@@ -33,7 +39,7 @@
    <widget class="QPushButton" name="pauseButton">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>212</x>
       <y>440</y>
       <width>75</width>
       <height>23</height>
@@ -46,7 +52,7 @@
    <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>390</x>
       <y>440</y>
       <width>75</width>
       <height>23</height>
@@ -59,36 +65,29 @@
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>34</x>
       <y>410</y>
-      <width>291</width>
+      <width>430</width>
       <height>23</height>
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tableView">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>150</y>
-      <width>291</width>
-      <height>241</height>
-     </rect>
+     <number>0</number>
     </property>
    </widget>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>20</y>
+      <x>104</x>
+      <y>10</y>
       <width>291</width>
-      <height>121</height>
+      <height>124</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="urlEdit"/>
+     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="depthLabel">
        <property name="font">
@@ -98,36 +97,6 @@
        </property>
        <property name="text">
         <string>Depth</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="urlEdit"/>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="keywordEdit"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="keywordLabel">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Keyword</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="urlLabel">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Start URL</string>
        </property>
       </widget>
      </item>
@@ -148,12 +117,90 @@
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
+       <property name="value">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="urlLabel">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Start URL</string>
+       </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QSpinBox" name="threadsBox"/>
+      <widget class="QSpinBox" name="threadsBox">
+       <property name="maximum">
+        <number>16</number>
+       </property>
+       <property name="value">
+        <number>4</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="keywordLabel">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Keyword</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="keywordEdit">
+       <property name="dragEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="statusROLabel">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Status</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="statusLabel">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Stopped</string>
+       </property>
+      </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>34</x>
+      <y>150</y>
+      <width>430</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustIgnored</enum>
+    </property>
    </widget>
   </widget>
  </widget>
