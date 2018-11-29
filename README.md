@@ -10,3 +10,9 @@ Note:
  Compiled with MinGW 5.1
  
  Place OpenSSL libs nearly binary to make SSL work
+
+To test:
+
+ Ideal way is use some script language to create the three of folders with some index.htmls and hyperlinks inside of it.
+ 
+ I tested with stackoverflow links.
