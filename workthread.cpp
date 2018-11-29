@@ -13,11 +13,13 @@ WorkThread::WorkThread(shQueue<std::string> &urls_queue,
                        QString keyword,
                        std::atomic<int> &status,
                        int depth,
+                       std::function<void(std::string)> on_start_cb,
                        std::function<void(URL_PAIR)> on_finish_cb) :
     mUrlsQueue(urls_queue),
     mKeyword(keyword),
     mThreadStatus(status),
     mSearchDepth(depth),
+    mThreadStarted(on_start_cb),
     mThreadFinished(on_finish_cb)
 {
 }
@@ -61,8 +63,8 @@ void WorkThread::run()
                 continue;
             } else {
                 std::string threadResult = workingOnThatStatus;
-                if (mThreadFinished) {
-                    mThreadFinished(std::make_pair(mUrl, threadResult));
+                if (mThreadStarted) {
+                    mThreadStarted(mUrl);
                 }
 
                 QNetworkAccessManager manager;

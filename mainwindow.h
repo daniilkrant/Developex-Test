@@ -19,15 +19,6 @@ class urlTableModel;
 class QTableWidget;
 class QTimer;
 
-/*
- * Known issues:
- *  - Status are only found/not found/error + code
- *    without "in progress". I had two ways to implement that.
- *    1) If I had used map I would have an ability to make
- *       "in progress", but speed would be affected a lot.
- *    2) I used vector to enhance speed.
- */
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -56,12 +47,14 @@ private:
     void initTable();
     void enableControls();
     void disableControls();
+    void onThreadStarted(std::string url);
     void onThreadFinished(URL_PAIR url_status);
     int calculateMaxUrls();
 
     Ui::MainWindow *ui;
     int mThreadsNum{};
     int mAnalyzedUrlNum{};
+    int mCurrentUrlIndex{};
     int mSearchDepth{};
     std::atomic<int> mCrawlStatus;
 

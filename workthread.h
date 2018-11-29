@@ -19,6 +19,7 @@ public:
                QString keyword,
                std::atomic<int> &status,
                int depth,
+               std::function<void(std::string)> on_start_cb,
                std::function<void(URL_PAIR)> on_finish_cb);
 
 protected:
@@ -34,6 +35,7 @@ private:
     std::atomic<int> &mThreadStatus;
     int mSearchDepth{};
     int mCurrentSearchDepth{};
+    std::function<void(std::string)> mThreadStarted;
     std::function<void(URL_PAIR)> mThreadFinished;
 };
 

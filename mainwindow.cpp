@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    mCrawlStatus = STATUS_STOPPED;
     mThreadPool.waitForDone();
     delete ui;
 }
@@ -93,29 +94,36 @@ int MainWindow::getInput()
     return 1;
 }
 
+void MainWindow::onThreadStarted(std::string url)
+{
+    if (mCrawlStatus == STATUS_WORKING) {
+        mResultMutex.lock();
+        mUrlPositionMap.emplace(url, mCurrentUrlIndex);
+        mResultMutex.unlock();
+        mTableWidget->setItem(mCurrentUrlIndex, 0, new QTableWidgetItem(QString::fromStdString(url)));
+        mTableWidget->setItem(mCurrentUrlIndex, 1, new QTableWidgetItem(QString::fromStdString(workingOnThatStatus)));
+        ++mCurrentUrlIndex;
+    }
+}
+
+
 void MainWindow::onThreadFinished(URL_PAIR url_status)
 {
     if (mCrawlStatus == STATUS_WORKING) {
         mResultMutex.lock();
         mCrawlResult.emplace(url_status.first, url_status.second);
-        mUrlPositionMap.emplace(url_status.first, mAnalyzedUrlNum);
         mResultMutex.unlock();
-        if (!url_status.second.compare(workingOnThatStatus)) {
-            mTableWidget->setItem(mAnalyzedUrlNum, 0, new QTableWidgetItem(QString::fromStdString(url_status.first)));
-            mTableWidget->setItem(mAnalyzedUrlNum, 1, new QTableWidgetItem(QString::fromStdString(url_status.second)));
-        } else {
-            int urlPosition = mUrlPositionMap.find(url_status.first)->second;
-            mTableWidget->item(urlPosition, 1)->setText(QString::fromStdString(url_status.second));
-            if (QString::fromStdString(url_status.second).contains(errorPrefix)) {
-                mTableWidget->item(urlPosition, 1)->setBackground(Qt::red);
-            }
+        int urlPosition = mUrlPositionMap.find(url_status.first)->second;
+        mTableWidget->item(urlPosition, 1)->setText(QString::fromStdString(url_status.second));
+        if (QString::fromStdString(url_status.second).contains(errorPrefix)) {
+            mTableWidget->item(urlPosition, 1)->setBackground(Qt::red);
+        }
 
-            ++mAnalyzedUrlNum;
-            emit updateProgressBar(mAnalyzedUrlNum);
+        ++mAnalyzedUrlNum;
+        emit updateProgressBar(mAnalyzedUrlNum);
 
-            if (mAnalyzedUrlNum == calculateMaxUrls()) {
-                emit updateStatus(STATUS_STOPPED);
-            }
+        if (mAnalyzedUrlNum == calculateMaxUrls()) {
+            emit updateStatus(STATUS_STOPPED);
         }
     }
 }
@@ -126,6 +134,7 @@ void MainWindow::initTable()
     mTableWidget->setColumnCount(2);
     mTableWidget->setSortingEnabled(false);
     mTableWidget ->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    mTableWidget->setAutoScroll(false);
     QStringList header;
     header << "URL" << "Result";
     mTableWidget->setHorizontalHeaderLabels(header);
@@ -170,8 +179,10 @@ void MainWindow::setStatus(int status)
     } else
     if (mCrawlStatus == STATUS_STOPPED) {
         this->findChild<QLabel*>("statusLabel")->setText("Stopped");
+        mThreadPool.waitForDone();
         mUrlsQueue.clear();
         mAnalyzedUrlNum = 0;
+        mCurrentUrlIndex = 0;
         emit updateProgressBar(0);
         enableControls();
     }
@@ -187,7 +198,9 @@ void MainWindow::on_startButton_released()
 
             mUrlsQueue.push(mUrl.toStdString());
             mThreadPool.setMaxThreadCount(mThreadsNum);
-            std::function<void(URL_PAIR)> cb = [this](URL_PAIR retval) {onThreadFinished(retval);};
+
+            std::function<void(std::string)> start_cb = [this](std::string retval) {onThreadStarted(retval);};
+            std::function<void(URL_PAIR)> finish_cb = [this](URL_PAIR retval) {onThreadFinished(retval);};
 
             qInfo() << "Starting " << mThreadsNum << " threads";
             qInfo() << "Initial URL: " << mUrl;
@@ -196,7 +209,8 @@ void MainWindow::on_startButton_released()
             mTimeOutTimer->start();
 
             for (int i = 0; i < mThreadsNum; ++i) {
-                WorkThread *thread = new WorkThread(mUrlsQueue, mKeyword, mCrawlStatus, mSearchDepth, cb);
+                WorkThread *thread = new WorkThread(mUrlsQueue, mKeyword, mCrawlStatus, mSearchDepth,
+                                                    start_cb, finish_cb);
                 thread->setAutoDelete(true);
                 mThreadPool.start(thread);
             }
