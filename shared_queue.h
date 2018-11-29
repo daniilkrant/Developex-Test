@@ -4,10 +4,12 @@
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <set>
 
 template<typename T>
 class shQueue {
    std::queue<T> queue_;
+   std::set<T> set_;
    mutable std::mutex m_;
    std::condition_variable data_cond_;
 
@@ -20,7 +22,11 @@ public:
    void push(T item) {
       {
          std::lock_guard<std::mutex> lock(m_);
-         queue_.push(std::move(item));
+         if (set_.find(item) == set_.end())
+         {
+             queue_.push(std::move(item));
+             set_.emplace(queue_.back());
+         }
       }
       data_cond_.notify_one();
    }
@@ -58,7 +64,9 @@ public:
    void clear()
    {
       std::queue<T> empty;
-      std::swap( queue_, empty );
+      std::swap(queue_, empty);
+      std::set<T> empty_s;
+      std::swap(set_, empty_s);
    }
 };
 

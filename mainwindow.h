@@ -64,7 +64,8 @@ private:
     QTableWidget *mTableWidget;
     QThreadPool mThreadPool;
     QTimer *mTimeOutTimer;
-    std::mutex mResultMutex;
+    std::mutex mThStartMutex;
+    std::mutex mThFinishMutex;
     shQueue<std::string> mUrlsQueue;
     std::map<std::string, std::string> mCrawlResult;
     std::map<std::string, int> mUrlPositionMap;

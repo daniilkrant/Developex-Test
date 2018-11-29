@@ -97,9 +97,8 @@ int MainWindow::getInput()
 void MainWindow::onThreadStarted(std::string url)
 {
     if (mCrawlStatus == STATUS_WORKING) {
-        mResultMutex.lock();
+        std::lock_guard<std::mutex>lock(mThStartMutex);
         mUrlPositionMap.emplace(url, mCurrentUrlIndex);
-        mResultMutex.unlock();
         mTableWidget->setItem(mCurrentUrlIndex, 0, new QTableWidgetItem(QString::fromStdString(url)));
         mTableWidget->setItem(mCurrentUrlIndex, 1, new QTableWidgetItem(QString::fromStdString(workingOnThatStatus)));
         ++mCurrentUrlIndex;
@@ -110,9 +109,8 @@ void MainWindow::onThreadStarted(std::string url)
 void MainWindow::onThreadFinished(URL_PAIR url_status)
 {
     if (mCrawlStatus == STATUS_WORKING) {
-        mResultMutex.lock();
+        std::lock_guard<std::mutex>lock(mThFinishMutex);
         mCrawlResult.emplace(url_status.first, url_status.second);
-        mResultMutex.unlock();
         int urlPosition = mUrlPositionMap.find(url_status.first)->second;
         mTableWidget->item(urlPosition, 1)->setText(QString::fromStdString(url_status.second));
         if (QString::fromStdString(url_status.second).contains(errorPrefix)) {

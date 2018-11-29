@@ -84,6 +84,7 @@ void WorkThread::run()
                 if (mThreadFinished) {
                     mThreadFinished(std::make_pair(mUrl, threadResult));
                 }
+
                 ++mCurrentSearchDepth;
 
                 response->deleteLater();
